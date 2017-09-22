@@ -8,6 +8,10 @@ html(class="no-js", lang="ru")
     head
         +head(head.defaults)
     body.page
+
+        div.bottomSection
+          div.basket#orange Корзинка для оранжевых фигур
+          div.basket#green Корзинка для зелёных фигур
         |%=symbols=%
         script(src='%=static=%js/separate-js/svg4everybody.min.js')
         script svg4everybody();
