@@ -42,7 +42,6 @@ if (document.body.clientWidth > 500) {
 
 document.querySelector('.countFigure').innerHTML = `Количество фигурок: ${count}`;
 document.querySelector('.score').innerHTML = `Счёт: 0`;
-console.log(count);
 
 for(let i = 0; i < count; i++) {
 
@@ -60,24 +59,22 @@ for(let i = 0; i < count; i++) {
     }
 
     changePosition();
-    // console.log(document.body.clientWidth)
-    while (countPosition() === true) {
+    countPosition();
+
+    if (countPosition() === true) {
       changePosition();
       countPosition();
     }
 
     if (countPosition() === false) {
       arrCoords.push({left: figureX, top: figureY});
-      document.body.innerHTML += `<div class='figure draggable ${figureForm} ${figureClass}' style='left: ${figureX}px; top: ${figureY}px; height: ${sizes}; width: ${sizes}; background-color: ${figureColor}'></div>`;
+      document.body.innerHTML += `<div
+                                  class='figure draggable ${figureForm} ${figureClass}'
+                                  style='left: ${figureX}px; top: ${figureY}px;
+                                  height: ${sizes}; width: ${sizes};
+                                  background-color: ${figureColor}'>
+                                  </div>`;
     }
-    console.log(arrCoords);
-    // let greenColor = greenRange[Math.ceil(Math.random() * (greenRange.length - 0) + 0)];
-    // let orangeColor = orangeRange[Math.ceil(Math.random() * (orangeRange.length - 0) + 0)];
-
-
-    // document.body.innerHTML += `<div class='${square} ${itemClass}' style='left: ${figureX}px; top: ${figureY}px; background-color: ${orangeColor}'></div>`;
-
-    // console.log(mutator);
 }
 
 let getCoords = (elem) => {
@@ -227,9 +224,14 @@ let DragManager = new function() {
 
 
 
-  document.onmousemove = onMouseMove;
-  document.onmouseup = onMouseUp;
-  document.onmousedown = onMouseDown;
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("touchmove", onMouseMove);
+
+  document.addEventListener("mouseup", onMouseUp);
+  document.addEventListener("touchend", onMouseUp);
+
+  document.addEventListener("mousedown", onMouseDown);
+  document.addEventListener("touchstart", onMouseDown);
 
   this.onDragEnd = function(dragObject, dropElem) {};
   this.onDragCancel = function(dragObject) {};
