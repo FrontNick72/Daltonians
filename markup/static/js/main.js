@@ -1,5 +1,9 @@
 'use strict';
 
+if ('ontouchstart' in window) {
+ console.log("Событие касания есть");
+}
+
 let mutator,
     figureClass,
     figureColor,
@@ -41,16 +45,15 @@ if (document.body.clientWidth > 500) {
 
 
 document.querySelector('.countFigure').innerHTML = `Количество фигурок: ${count}`;
-document.querySelector('.score').innerHTML = `Счёт: 0`;
 
 for(let i = 0; i < count; i++) {
 
-    mutator = getRandom(0, 20);
+    mutator = getRandom(0, 4);
 
     figureForm = forms[getRandom(0, 1)];
     sizes = sizeValues[getRandom(0, 3)];
 
-    if (mutator > 10) {
+    if (mutator > 2) {
       figureClass = "orange";
       figureColor = orangeRange[getRandom(0, orangeRange.length)];
     } else {
@@ -95,7 +98,7 @@ let DragManager = new function() {
 
   let onMouseDown = (e) => {
 
-    if (e.which != 1) return;
+    // if (e.which != 1) return;
 
     let elem = e.target.closest('.draggable');
     if (!elem) return;
@@ -103,8 +106,14 @@ let DragManager = new function() {
     dragObject.elem = elem;
 
     // запомним, что элемент нажат на текущих координатах pageX/pageY
-    dragObject.downX = e.pageX;
-    dragObject.downY = e.pageY;
+    if ((e.pageX)&&(e.pageY)) {
+      dragObject.downX = e.pageX;
+      dragObject.downY = e.pageY;
+    } else if (e.targetTouches) {
+      dragObject.downX = e.targetTouches[0].pageX;
+      dragObject.downY = e.targetTouches[0].pageY;
+      e.preventDefault();
+    }
 
     return false;
   };
@@ -144,11 +153,20 @@ let DragManager = new function() {
   }
 
   let onMouseMove = (e) => {
+    e.preventDefault();
     if (!dragObject.elem) return; // элемент не зажат
 
     if (!dragObject.avatar) { // если перенос неначат...
-      let moveX = e.pageX - dragObject.downX;
-      let moveY = e.pageY - dragObject.downY;
+      let moveX,
+          moveY;
+      if ((e.pageX)&&(e.pageY)) {
+        moveX = e.pageX - dragObject.downX;
+        moveY = e.pageY - dragObject.downY;
+      } else if (e.targetTouches) {
+        moveX = e.targetTouches[0].pageX - dragObject.downX;
+        moveY = e.targetTouches[0].pageY - dragObject.downY;
+        e.preventDefault();
+      }
 
       // если мышь передвинулась в нажатом состоянии недостаточно далеко
       if (Math.abs(moveX) < 3 && Math.abs(moveY) < 3) {
@@ -170,10 +188,18 @@ let DragManager = new function() {
       console.log(document.body.scrollWidth);
       startDrag(e); // отобразить начало переноса
     }
+
     let coords = getCoords(dragObject.avatar);
     // отобразить перенос объекта при каждом движении мыши
-    dragObject.avatar.style.left = e.pageX - dragObject.shiftX + 'px';
-    dragObject.avatar.style.top = e.pageY - dragObject.shiftY + 'px';
+    if ((e.pageX)&&(e.pageY)) {
+      dragObject.avatar.style.left = e.pageX - dragObject.shiftX + 'px';
+      dragObject.avatar.style.top = e.pageY - dragObject.shiftY + 'px';
+    } else if (e.targetTouches) {
+      dragObject.avatar.style.left = e.targetTouches[0].pageX - dragObject.shiftX + 'px';
+      dragObject.avatar.style.top = e.targetTouches[0].pageY - dragObject.shiftY + 'px';
+      e.preventDefault();
+    }
+
     console.log(coords);
     if ((parseInt(dragObject.avatar.style.left)) > (document.body.clientWidth - coords.width))  {
       dragObject.avatar.style.left = document.body.clientWidth - coords.width + 'px';
@@ -187,9 +213,22 @@ let DragManager = new function() {
   let findDroppable = (event) => {
     // спрячем переносимый элемент
     dragObject.avatar.hidden = true;
-
+    let elem,
+        touch,
+        coordX,
+        coordY;
     // получить самый вложенный элемент под курсором мыши
-    let elem = document.elementFromPoint(event.clientX, event.clientY);
+    // if ((event.clientX)&&(event.clientY)) {
+      elem = document.elementFromPoint(event.clientX, event.clientY);
+
+    // } else if (event.targetTouches) {
+    //   touch = event.targetTouches[0];
+    //   coordX = touch.clientX;
+    //   coordY = touch.clientY;
+    //   elem = document.elementFromPoint(coordX, coordY);
+    //   event.preventDefault();
+    // }
+
 
     // показать переносимый элемент обратно
     dragObject.avatar.hidden = false;
@@ -198,18 +237,18 @@ let DragManager = new function() {
       // такое возможно, если курсор мыши "вылетел" за границу окна
       return null;
     }
-
+    console.log(elem);
     return elem.closest('.droppable');
   };
 
   let finishDrag = (e) => {
     let dropElem = findDroppable(e);
 
-    if (!dropElem) {
-      self.onDragCancel(dragObject);
-    } else {
-      self.onDragEnd(dragObject, dropElem);
-    }
+    // if (!dropElem) {
+    //   self.onDragCancel(dragObject);
+    // } else {
+    //   self.onDragEnd(dragObject, dropElem);
+    // }
   };
 
   let onMouseUp = (e) => {
@@ -225,13 +264,14 @@ let DragManager = new function() {
 
 
   document.addEventListener("mousemove", onMouseMove);
-  document.addEventListener("touchmove", onMouseMove);
+  document.addEventListener("touchstart", onMouseDown, true);
+  document.addEventListener("touchmove", onMouseMove, true);
 
   document.addEventListener("mouseup", onMouseUp);
-  document.addEventListener("touchend", onMouseUp);
-
+  document.addEventListener("touchend", onMouseUp, true);
+  document.addEventListener("touchcancel", onMouseUp, true);
   document.addEventListener("mousedown", onMouseDown);
-  document.addEventListener("touchstart", onMouseDown);
+
 
   this.onDragEnd = function(dragObject, dropElem) {};
   this.onDragCancel = function(dragObject) {};
