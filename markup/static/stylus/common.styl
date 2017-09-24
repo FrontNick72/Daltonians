@@ -18,8 +18,10 @@ html, body
 
 body
   background-color: #fff;
-  position relative
-  height 100vh
+  display flex
+  flex-direction column
+  justify-content space-between
+  height 100%
   margin 0
   padding 0
   .bottomSection
@@ -27,13 +29,10 @@ body
     justify-content space-around
     height 188px
     width 100%
-    position absolute
-    left 0
-    bottom 0
-    margin-bottom 12px
+
     @media (max-width: 450px)
         height 150px
-        margin-bottom 50px
+
     @media (max-width: 350px)
         height 100px
     .basket
@@ -67,10 +66,3 @@ body
     font-size 18px
   @media (max-width: 350px)
     height 16px
-
-
-
-// .red
-//   background #ff3c41
-// .yellow
-//   background #fcd000
