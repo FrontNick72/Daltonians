@@ -150,7 +150,7 @@ let DragManager = new function() {
     };
 
     return avatar;
-  }
+  };
 
   let onMouseMove = (e) => {
     e.preventDefault();
@@ -216,19 +216,15 @@ let DragManager = new function() {
     let elem,
         touch,
         coordX,
-        coordY;
-    // получить самый вложенный элемент под курсором мыши
-    // if ((event.clientX)&&(event.clientY)) {
+        coordY,
+        points;
+
+    if ((event.clientX)&&(event.clientY)) {
       elem = document.elementFromPoint(event.clientX, event.clientY);
-
-    // } else if (event.targetTouches) {
-    //   touch = event.targetTouches[0];
-    //   coordX = touch.clientX;
-    //   coordY = touch.clientY;
-    //   elem = document.elementFromPoint(coordX, coordY);
-    //   event.preventDefault();
-    // }
-
+    } else if (event.changedTouches) {
+      elem = document.elementFromPoint(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+      event.preventDefault();
+    }
 
     // показать переносимый элемент обратно
     dragObject.avatar.hidden = false;
@@ -237,18 +233,19 @@ let DragManager = new function() {
       // такое возможно, если курсор мыши "вылетел" за границу окна
       return null;
     }
-    console.log(elem);
-    return elem.closest('.droppable');
+
+    return elem.closest('.basket-orange');
   };
 
   let finishDrag = (e) => {
     let dropElem = findDroppable(e);
+    console.log(dropElem);
+    if (!dropElem) {
+      // self.onDragCancel(dragObject);
 
-    // if (!dropElem) {
-    //   self.onDragCancel(dragObject);
-    // } else {
-    //   self.onDragEnd(dragObject, dropElem);
-    // }
+    } else {
+    self.onDragEnd(dragObject, dropElem);
+    }
   };
 
   let onMouseUp = (e) => {
@@ -277,3 +274,33 @@ let DragManager = new function() {
   this.onDragCancel = function(dragObject) {};
 
 };
+
+let counters = parseIntMod(document.querySelector('.countFigure').innerHTML);
+console.log( counters );
+
+DragManager.onDragCancel = function(dragObject) {
+  dragObject.avatar.rollback();
+};
+
+DragManager.onDragEnd = function(dragObject, dropElem) {
+  dragObject.elem.style.display = 'none';
+  dropElem.classList.add('computer-smile');
+  setTimeout(function() {
+    dropElem.classList.remove('computer-smile');
+  }, 200);
+};
+
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+function parseIntMod(n) {
+  var result = "";
+  for (var i = 0; i < n.length; i++) {
+    if ( isNumber(n[i]) == false ) continue;
+
+    result += n[i];
+  }
+
+  return +result;
+}
