@@ -1,14 +1,10 @@
 'use strict';
 
-if ('ontouchstart' in window) {
- console.log("Событие касания есть");
-}
-
 let mutator,
     figureClass,
     figureColor,
     figureForm,
-    sizes,
+    size,
     figureX,
     figureY,
     arrCoords,
@@ -16,7 +12,7 @@ let mutator,
 
 
 const forms = ["circle", "square"],
-      sizeValues = ["30px", "40px", "50px", "60px"],
+      // sizeValues = ["30px", "40px", "50px", "60px"],
       greenRange = ['#abf977','#a8f877','#a5f776','#a0f775','#9cf575','#99f574','#96f474','#93f473','#8ff273','#8af172','#86f172','#81f071','#7eef71','#7bee70','#77ed70','#72ed6f','#6deb6f','#68eb6e','#62ea6d','#5ee96d','#5ae86d','#56e76c','#50e76c','#49e56b','#42e46b','#39e36a','#30e369','#23e269','#18e168','#00e068'],
       orangeRange = ['#e05900','#e05c00','#e05f00','#e06100','#e06400','#e16700','#e16900','#e16c00','#e16f00','#e17100','#e17300','#e17700','#e17800','#e17b00','#e17e00','#e18000','#e18300','#e18500','#e18700','#e18900','#e18b00','#e18e00','#e19000','#e19300','#e19400','#e19600','#e09a00','#e09c00','#e09d00','#e0a000'];
 
@@ -29,7 +25,11 @@ const changePosition = () => {
 
 const countPosition = () => {
   return arrCoords.some(function(item, index) {
-    return ( (figureX <= item.left + 70 && figureX >= item.left - 70) && (figureY <= item.top + 70 && figureY >= item.top - 70));
+    if (document.body.clientWidth > 500) {
+      return ( (figureX <= item.left + 70 && figureX >= item.left - 70) && (figureY <= item.top + 70 && figureY >= item.top - 70));
+    } else {
+      return ( (figureX <= item.left + 35 && figureX >= item.left - 35) && (figureY <= item.top + 35 && figureY >= item.top - 35));
+    }
   });
 };
 
@@ -38,22 +38,25 @@ let getRandom = (min, max) => {
 }
 
 if (document.body.clientWidth > 500) {
-  count = getRandom(12, 18);
+  count = getRandom(10, 16);
 } else {
-  count = getRandom(4, 8);
+  count = getRandom(5, 10);
 }
 
 
-document.querySelector('.countFigure').innerHTML = `Количество фигурок: ${count}`;
 
 for(let i = 0; i < count; i++) {
 
-    mutator = getRandom(0, 4);
+    mutator = getRandom(0, 1);
 
     figureForm = forms[getRandom(0, 1)];
-    sizes = sizeValues[getRandom(0, 3)];
+    if (document.body.clientWidth > 500) {
+      size = getRandom(30, 60);
+    } else {
+      size = getRandom(15, 30);
+    }
 
-    if (mutator > 2) {
+    if (mutator === 1) {
       figureClass = "orange";
       figureColor = orangeRange[getRandom(0, orangeRange.length)];
     } else {
@@ -64,7 +67,7 @@ for(let i = 0; i < count; i++) {
     changePosition();
     countPosition();
 
-    if (countPosition() === true) {
+    while (countPosition() === true) {
       changePosition();
       countPosition();
     }
@@ -74,11 +77,13 @@ for(let i = 0; i < count; i++) {
       document.body.innerHTML += `<div
                                   class='figure draggable ${figureForm} ${figureClass}'
                                   style='left: ${figureX}px; top: ${figureY}px;
-                                  height: ${sizes}; width: ${sizes};
+                                  height: ${size}px; width: ${size}px;
                                   background-color: ${figureColor}'>
                                   </div>`;
     }
 }
+
+document.querySelector('.score').innerHTML = `${count}`;
 
 let getCoords = (elem) => {
   let box = elem.getBoundingClientRect();
@@ -96,7 +101,7 @@ let DragManager = new function() {
 
   let self = this;
 
-  let onMouseDown = (e) => {
+  const onMouseDown = (e) => {
 
     // if (e.which != 1) return;
 
@@ -104,7 +109,6 @@ let DragManager = new function() {
     if (!elem) return;
 
     dragObject.elem = elem;
-
     // запомним, что элемент нажат на текущих координатах pageX/pageY
     if ((e.pageX)&&(e.pageY)) {
       dragObject.downX = e.pageX;
@@ -112,13 +116,12 @@ let DragManager = new function() {
     } else if (e.targetTouches) {
       dragObject.downX = e.targetTouches[0].pageX;
       dragObject.downY = e.targetTouches[0].pageY;
-      e.preventDefault();
     }
 
     return false;
   };
 
-  let startDrag = (e) => {
+  const startDrag = (e) => {
     let avatar = dragObject.avatar;
 
     // инициировать начало переноса
@@ -127,32 +130,14 @@ let DragManager = new function() {
     avatar.style.position = 'absolute';
   };
 
-  let createAvatar = (e) => {
-
+  const createAvatar = (e) => {
     // запомнить старые свойства, чтобы вернуться к ним при отмене переноса
     let avatar = dragObject.elem;
-    let old = {
-      parent: avatar.parentNode,
-      nextSibling: avatar.nextSibling,
-      position: avatar.position || '',
-      left: avatar.left || '',
-      top: avatar.top || '',
-      zIndex: avatar.zIndex || ''
-    };
-
-    // функция для отмены переноса
-    avatar.rollback = function() {
-      old.parent.insertBefore(avatar, old.nextSibling);
-      avatar.style.position = old.position;
-      avatar.style.left = old.left;
-      avatar.style.top = old.top;
-      avatar.style.zIndex = old.zIndex
-    };
 
     return avatar;
   };
 
-  let onMouseMove = (e) => {
+  const onMouseMove = (e) => {
     e.preventDefault();
     if (!dragObject.elem) return; // элемент не зажат
 
@@ -165,7 +150,6 @@ let DragManager = new function() {
       } else if (e.targetTouches) {
         moveX = e.targetTouches[0].pageX - dragObject.downX;
         moveY = e.targetTouches[0].pageY - dragObject.downY;
-        e.preventDefault();
       }
 
       // если мышь передвинулась в нажатом состоянии недостаточно далеко
@@ -185,7 +169,6 @@ let DragManager = new function() {
       coords = getCoords(dragObject.avatar);
       dragObject.shiftX = dragObject.downX - coords.left;
       dragObject.shiftY = dragObject.downY - coords.top;
-      console.log(document.body.scrollWidth);
       startDrag(e); // отобразить начало переноса
     }
 
@@ -197,10 +180,9 @@ let DragManager = new function() {
     } else if (e.targetTouches) {
       dragObject.avatar.style.left = e.targetTouches[0].pageX - dragObject.shiftX + 'px';
       dragObject.avatar.style.top = e.targetTouches[0].pageY - dragObject.shiftY + 'px';
-      e.preventDefault();
     }
 
-    console.log(coords);
+
     if ((parseInt(dragObject.avatar.style.left)) > (document.body.clientWidth - coords.width))  {
       dragObject.avatar.style.left = document.body.clientWidth - coords.width + 'px';
     } else if (parseInt(dragObject.avatar.style.left) < 0) {
@@ -210,7 +192,7 @@ let DragManager = new function() {
     return false;
   };
 
-  let findDroppable = (event) => {
+  const findDroppable = (event) => {
     // спрячем переносимый элемент
     dragObject.avatar.hidden = true;
     let elem,
@@ -233,22 +215,49 @@ let DragManager = new function() {
       // такое возможно, если курсор мыши "вылетел" за границу окна
       return null;
     }
+    if (event.target.classList.contains('orange') && elem.closest('.basket-orange')) {
+      return elem.closest('.basket-orange');
+    } else if ( event.target.classList.contains('orange') && !elem.closest('.basket-orange') && !elem.classList.contains('page') ) {
+      event.target.remove();
+      document.querySelector('.score').innerHTML -= 1;
 
-    return elem.closest('.basket-orange');
+      if(document.querySelectorAll('.figure').length === 0) {
+        if (count === 0) {
+          alert("Вы не дальтоник");
+        } else {
+          alert("Вы дальтоник");
+        }
+      }
+
+    }
+
+    if (event.target.classList.contains('green') && elem.closest('.basket-green')) {
+      return elem.closest('.basket-green');
+    } else if ( event.target.classList.contains('green') && !elem.closest('.basket-green') && !elem.classList.contains('page') ) {
+      event.target.remove();
+      document.querySelector('.score').innerHTML -= 1;
+
+      if(document.querySelectorAll('.figure').length === 0) {
+        if (count === 0) {
+          alert("Вы не дальтоник");
+        } else {
+          alert("Вы дальтоник");
+        }
+      }
+
+    }
+
   };
 
-  let finishDrag = (e) => {
+  const finishDrag = (e) => {
     let dropElem = findDroppable(e);
-    console.log(dropElem);
-    if (!dropElem) {
-      // self.onDragCancel(dragObject);
 
-    } else {
-    self.onDragEnd(dragObject, dropElem);
+    if (dropElem) {
+      self.onDragEnd(dragObject, dropElem);
     }
   };
 
-  let onMouseUp = (e) => {
+  const onMouseUp = (e) => {
     if (dragObject.avatar) { // если перенос идет
       finishDrag(e);
     }
@@ -258,49 +267,34 @@ let DragManager = new function() {
     dragObject = {};
   };
 
-
-
-  document.addEventListener("mousemove", onMouseMove);
   document.addEventListener("touchstart", onMouseDown, true);
   document.addEventListener("touchmove", onMouseMove, true);
-
-  document.addEventListener("mouseup", onMouseUp);
   document.addEventListener("touchend", onMouseUp, true);
-  document.addEventListener("touchcancel", onMouseUp, true);
+
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mouseup", onMouseUp);
   document.addEventListener("mousedown", onMouseDown);
 
-
   this.onDragEnd = function(dragObject, dropElem) {};
-  this.onDragCancel = function(dragObject) {};
-
 };
 
-let counters = parseIntMod(document.querySelector('.countFigure').innerHTML);
-console.log( counters );
-
-DragManager.onDragCancel = function(dragObject) {
-  dragObject.avatar.rollback();
-};
+if (!Element.prototype.remove) {
+  Element.prototype.remove = function remove() {
+    if (this.parentNode) {
+      this.parentNode.removeChild(this);
+    }
+  };
+}
 
 DragManager.onDragEnd = function(dragObject, dropElem) {
-  dragObject.elem.style.display = 'none';
-  dropElem.classList.add('computer-smile');
-  setTimeout(function() {
-    dropElem.classList.remove('computer-smile');
-  }, 200);
-};
-
-function isNumber(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-}
-
-function parseIntMod(n) {
-  var result = "";
-  for (var i = 0; i < n.length; i++) {
-    if ( isNumber(n[i]) == false ) continue;
-
-    result += n[i];
+  document.querySelector('.score').innerHTML -= 1
+  dragObject.elem.remove();
+  count--;
+  if(document.querySelectorAll('.figure').length === 0) {
+    if (count === 0) {
+      alert("Вы не дальтоник");
+    } else {
+      alert("Вы дальтоник");
+    }
   }
-
-  return +result;
-}
+};

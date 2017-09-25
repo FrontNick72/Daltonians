@@ -8,12 +8,12 @@ html(lang="ru")
   head
     +head(head.defaults)
   body.page
-    span.countFigure
-    span.score
+    span.countFigure Количество фигурок
+      span.score
 
     div.bottomSection
-      div.basket#orange Корзинка для оранжевых фигур
-      div.basket#green Корзинка для зелёных фигур
+      div.basket.basket-orange#orange Корзинка для оранжевых фигур
+      div.basket.basket-green#green Корзинка для зелёных фигур
     |%=symbols=%
     script(src='%=static=%js/separate-js/svg4everybody.min.js')
     script svg4everybody();
