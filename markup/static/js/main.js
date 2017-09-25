@@ -227,6 +227,7 @@ let DragManager = new function() {
         } else {
           alert("Вы дальтоник");
         }
+        location.reload();
       }
 
     }
@@ -243,6 +244,7 @@ let DragManager = new function() {
         } else {
           alert("Вы дальтоник");
         }
+        location.reload();
       }
 
     }
