@@ -128,6 +128,8 @@ let DragManager = new function() {
     document.body.appendChild(avatar);
     avatar.style.zIndex = 9999;
     avatar.style.position = 'absolute';
+    avatar.style.boxShadow = 'rgba(0, 0, 0, 0.35) 0px 0px 25px';
+    avatar.style.transform = 'scale(1.3)';
   };
 
   const createAvatar = (e) => {
@@ -253,7 +255,8 @@ let DragManager = new function() {
 
   const finishDrag = (e) => {
     let dropElem = findDroppable(e);
-
+    dragObject.avatar.style.boxShadow = '';
+    dragObject.avatar.style.transform = 'scale(1)';
     if (dropElem) {
       self.onDragEnd(dragObject, dropElem);
     }
