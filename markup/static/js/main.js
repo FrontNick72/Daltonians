@@ -217,7 +217,7 @@ let DragManager = new function() {
     }
     if (event.target.classList.contains('orange') && elem.closest('.basket-orange')) {
       return elem.closest('.basket-orange');
-    } else if ( event.target.classList.contains('orange') && !elem.closest('.basket-orange') && !elem.classList.contains('page') ) {
+    } else if ( event.target.classList.contains('orange') && !elem.closest('.basket-orange') && !elem.classList.contains('page') && !elem.classList.contains('figure') ) {
       event.target.remove();
       document.querySelector('.score').innerHTML -= 1;
 
@@ -233,7 +233,7 @@ let DragManager = new function() {
 
     if (event.target.classList.contains('green') && elem.closest('.basket-green')) {
       return elem.closest('.basket-green');
-    } else if ( event.target.classList.contains('green') && !elem.closest('.basket-green') && !elem.classList.contains('page') ) {
+    } else if ( event.target.classList.contains('green') && !elem.closest('.basket-green') && !elem.classList.contains('page') && !elem.classList.contains('figure') ) {
       event.target.remove();
       document.querySelector('.score').innerHTML -= 1;
 
@@ -296,5 +296,6 @@ DragManager.onDragEnd = function(dragObject, dropElem) {
     } else {
       alert("Вы дальтоник");
     }
+    location.reload();
   }
 };
