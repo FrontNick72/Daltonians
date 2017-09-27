@@ -10,9 +10,7 @@ let mutator,
     arrCoords,
     count;
 
-
 const forms = ["circle", "square"],
-      // sizeValues = ["30px", "40px", "50px", "60px"],
       greenRange = ['#abf977','#a8f877','#a5f776','#a0f775','#9cf575','#99f574','#96f474','#93f473','#8ff273','#8af172','#86f172','#81f071','#7eef71','#7bee70','#77ed70','#72ed6f','#6deb6f','#68eb6e','#62ea6d','#5ee96d','#5ae86d','#56e76c','#50e76c','#49e56b','#42e46b','#39e36a','#30e369','#23e269','#18e168','#00e068'],
       orangeRange = ['#e05900','#e05c00','#e05f00','#e06100','#e06400','#e16700','#e16900','#e16c00','#e16f00','#e17100','#e17300','#e17700','#e17800','#e17b00','#e17e00','#e18000','#e18300','#e18500','#e18700','#e18900','#e18b00','#e18e00','#e19000','#e19300','#e19400','#e19600','#e09a00','#e09c00','#e09d00','#e0a000'];
 
@@ -54,7 +52,7 @@ for(let i = 0; i < count; i++) {
     if (document.body.clientWidth > 500) {
       size = getRandom(30, 60);
     } else {
-      size = getRandom(15, 30);
+      size = getRandom(24, 35);
     }
 
     if (mutator === 1) {
@@ -131,8 +129,7 @@ let DragManager = new function() {
     document.body.appendChild(avatar);
     avatar.style.zIndex = 9999;
     avatar.style.position = 'absolute';
-    avatar.style.boxShadow = 'rgba(0, 0, 0, 0.35) 0px 0px 25px';
-    avatar.style.transform = 'scale(1.3)';
+    avatar.classList.add('figure_drag');
   };
 
   const createAvatar = (e) => {
@@ -259,7 +256,7 @@ let DragManager = new function() {
   const finishDrag = (e) => {
     let dropElem = findDroppable(e);
     dragObject.avatar.style.boxShadow = '';
-    dragObject.avatar.style.transform = 'scale(1)';
+    dragObject.avatar.classList.remove('figure_drag')
     if (dropElem) {
       self.onDragEnd(dragObject, dropElem);
     }
