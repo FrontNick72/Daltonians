@@ -127,9 +127,12 @@ let DragManager = new function() {
 
     // инициировать начало переноса
     document.body.appendChild(avatar);
-    avatar.style.zIndex = 9999;
-    avatar.style.position = 'absolute';
-    avatar.classList.add('figure_drag');
+    setTimeout(() => {
+      avatar.style.zIndex = 9999;
+      avatar.style.position = 'absolute';
+      avatar.classList.add('figure_drag');
+    }, 1);
+
   };
 
   const createAvatar = (e) => {
@@ -256,10 +259,12 @@ let DragManager = new function() {
   const finishDrag = (e) => {
     let dropElem = findDroppable(e);
     dragObject.avatar.style.boxShadow = '';
-    dragObject.avatar.classList.remove('figure_drag')
+    dragObject.avatar.classList.remove('figure_drag');
+
     if (dropElem) {
       self.onDragEnd(dragObject, dropElem);
     }
+
   };
 
   const onMouseUp = (e) => {
@@ -292,7 +297,7 @@ if (!Element.prototype.remove) {
 }
 
 DragManager.onDragEnd = function(dragObject, dropElem) {
-  document.querySelector('.score').innerHTML -= 1
+  document.querySelector('.score').innerHTML -= 1;
   dragObject.elem.remove();
   count--;
   if(document.querySelectorAll('.figure').length === 0) {
