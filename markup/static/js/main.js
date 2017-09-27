@@ -48,6 +48,7 @@ if (document.body.clientWidth > 500) {
 for(let i = 0; i < count; i++) {
 
     mutator = getRandom(0, 1);
+    let rand;
 
     figureForm = forms[getRandom(0, 1)];
     if (document.body.clientWidth > 500) {
@@ -58,10 +59,12 @@ for(let i = 0; i < count; i++) {
 
     if (mutator === 1) {
       figureClass = "orange";
-      figureColor = orangeRange[getRandom(0, orangeRange.length)];
+      rand = getRandom(0, orangeRange.length - 1);
+      figureColor = orangeRange[rand];
     } else {
       figureClass = "green";
-      figureColor = greenRange[getRandom(0, greenRange.length)];
+      rand = getRandom(0, greenRange.length - 1);
+      figureColor = greenRange[rand];
     }
 
     changePosition();
